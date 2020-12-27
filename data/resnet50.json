@@ -1,0 +1,31 @@
+{
+  "name": "resnet50",
+  "dir": "../torch2trt",
+  "seg_num": 18,
+  "seg_files": [
+    "resnet50_18_1",
+    "resnet50_18_2",
+    "resnet50_18_3",
+    "resnet50_18_4",
+    "resnet50_18_5",
+    "resnet50_18_6",
+    "resnet50_18_7",
+    "resnet50_18_8",
+    "resnet50_18_9",
+    "resnet50_18_10",
+    "resnet50_18_11",
+    "resnet50_18_12",
+    "resnet50_18_13",
+    "resnet50_18_14",
+    "resnet50_18_15",
+    "resnet50_18_16",
+    "resnet50_18_17",
+    "resnet50_18_18"
+  ],
+  "min_bs": 1,
+  "opt_bs": 1,
+  "max_bs": 16,
+  "log_lvl": "INFO",
+  "cur_bs":1,
+  "test_iter":80
+}

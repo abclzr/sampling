@@ -1,0 +1,27 @@
+{
+  "name": "inception_v3",
+  "dir": "../torch2trt",
+  "seg_num": 14,
+  "seg_files": [
+    "inception_v3_14_1",
+    "inception_v3_14_2",
+    "inception_v3_14_3",
+    "inception_v3_14_4",
+    "inception_v3_14_5",
+    "inception_v3_14_6",
+    "inception_v3_14_7",
+    "inception_v3_14_8",
+    "inception_v3_14_9",
+    "inception_v3_14_10",
+    "inception_v3_14_11",
+    "inception_v3_14_12",
+    "inception_v3_14_13",
+    "inception_v3_14_14"
+  ],
+  "min_bs": 1,
+  "opt_bs": 1,
+  "max_bs": 16,
+  "log_lvl": "INFO",
+  "cur_bs":1,
+  "test_iter":80
+}
