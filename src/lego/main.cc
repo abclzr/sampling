@@ -68,6 +68,21 @@ float runTwoInstance(Instance *inst1, const int &l1, const int &r1, Instance *in
   for (int i = 0; i < numTest; ++i) {
     inst1->run(l1, r1);
     inst2->run(l2, r2);
+    cudaStreamSynchronize(nullptr);
+  }
+  CHECK(cudaEventRecord(stop_));
+  CHECK(cudaEventSynchronize(stop_));
+  float milli_sec = 0;
+  CHECK(cudaEventElapsedTime(&milli_sec, start_, stop_));
+  return milli_sec / numTest;
+}
+
+float runOneInstance(Instance *inst1, const int &l1, const int &r1) {
+  std::cout<<inst1->getModelName() << " "<<l1<<" "<<r1<<std::endl;
+  CHECK(cudaEventRecord(start_));
+  for (int i = 0; i < numTest; ++i) {
+    inst1->run(l1, r1);
+    cudaStreamSynchronize(nullptr);
   }
   CHECK(cudaEventRecord(stop_));
   CHECK(cudaEventSynchronize(stop_));
@@ -79,14 +94,16 @@ float runTwoInstance(Instance *inst1, const int &l1, const int &r1, Instance *in
 Record makeRecord(Instance *inst1, std::pair<int, int> interval1, int bs1, Instance *inst2, std::pair<int, int> interval2, int bs2) {
   inst1->setBindingDimentions(bs1);
   inst2->setBindingDimentions(bs2);
+  float result1 = runOneInstance(inst1, interval1.first, interval1.second);
+  float result2 = runOneInstance(inst2, interval2.first, interval2.second);
   float result = runTwoInstance(inst1, interval1.first, interval1.second, inst2, interval2.first, interval2.second);
-  Record record(inst1->getModelName(), interval1.first, interval1.second, bs1, inst2->getModelName(), interval2.first, interval2.second, bs2, result);
+  Record record(inst1->getModelName(), interval1.first, interval1.second, bs1, inst2->getModelName(), interval2.first, interval2.second, bs2, result1, result2, result);
   return record;
 }
 
 std::pair<int, int> pickTwo(int n) {
-  int n1 = rand() % n;
-  int n2 = rand() % n;
+  int n1 = rand() % (n-4);
+  int n2 = n1 + 4 + rand() % (n - n1 - 4);
   if (n1 > n2) std::swap(n1, n2);
   return std::make_pair(n1, n2);
 }
@@ -115,7 +132,9 @@ main(int argc, char const* argv[])
       for (int k = 0; k < numSample; ++k) {
         std::pair<int, int> interval1 = pickTwo(inst1->getSegNum());
         std::pair<int, int> interval2 = pickTwo(inst2->getSegNum());
-        outputFile<<makeRecord(inst1, interval1, 1, inst2, interval2, 1).toString()<<std::endl;
+        for (int bs1 = 4; bs1 <= 16; bs1 = bs1 * 2)
+          for (int bs2 = 4; bs2 <= 16; bs2 = bs2 * 2)
+            outputFile<<makeRecord(inst1, interval1, bs1, inst2, interval2, bs2).toString()<<std::endl;
       }
     }
   }
